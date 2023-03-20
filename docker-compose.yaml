@@ -1,0 +1,59 @@
+version: "3"
+
+volumes:
+  log-data:
+    driver: local
+  prometheus-data:
+  grafana-storage:
+
+services:
+  app:
+    build:
+      context: app
+    ports:
+      - "5000:5000"
+    volumes:
+      - log-data:/var
+    depends_on:
+      - fluentbit
+      - collector
+      - jaeger
+  fluentbit:
+    image: fluent/fluent-bit:latest
+    volumes:
+      - ./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - log-data:/var
+    ports:
+      - "3000:3000"
+    depends_on:
+      - collector
+      
+  # add opentelemetry collector
+  collector:
+    image: otel/opentelemetry-collector
+    command: [--config=/etc/otel-collector-config.yaml]
+    volumes:
+      - ./collector/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "13133:13133"
+    depends_on:
+      - jaeger      
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+    - "16686:16686"
+    - "14268"
+    - "14250"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
+    restart: always
+    ports:
+      - "9090:9090"
+    

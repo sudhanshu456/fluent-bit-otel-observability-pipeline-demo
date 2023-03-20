@@ -1,0 +1,11 @@
+Flask
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-exporter-otlp-proto-http
+opentelemetry-instrumentation-flask
+opentelemetry-instrumentation-wsgi
+opentelemetry-proto
+opentelemetry-sdk
+opentracing
+requests
+urllib3
