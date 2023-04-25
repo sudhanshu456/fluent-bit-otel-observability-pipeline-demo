@@ -19,7 +19,7 @@ docker-compose up --build
 curl -X GET http://localhost:5000/generate
 ```
 
-It will generate a tracec and a metrics.
+It will generate traces and metrics.
 
 ## Generate Hierarchical Span
 
